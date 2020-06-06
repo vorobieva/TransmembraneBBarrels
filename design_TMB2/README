@@ -1,0 +1,16 @@
+This is the workflow to design transmembrane beta-barrels. 
+For each round of designs, the exact command is in the batch_run.py file in the directory. The list of jobs is task.list. The jobs were submitted to slurm with the cmd.jobs script. 
+The output of the design runs were analyzed with the associated jupyter notebook. 
+The name of the pdb files are retained through the different rounds of designs, so that the final designs can be traced to parent backbones and all intermediates.
+
+1. Assemble centroid backbones as previously described. 
+XML file:
+/home/av9/beta_barrel/bluePrintBuild/membrane_barrel/backbones_1/input.xml
+The input files are located directly in the /home/av9/beta_barrel/bluePrintBuild/membrane_barrel/backbones_1/ directory. 
+
+2. The best centroid backbones were selected (backbones_analysis.ipynb). A dummy sequence is designed to refine the backbones in full-atom mode (in best_200; xml file design.xml).
+The lowest energy designs were selected in the jupyter notebook backbones_analysis.ipynb and copied to the folder round1. 
+
+3. The hbnet.xml script in the round1 folder searches for all possible TYR/GLY/ASP/GLU motifs with hbnet. The sensitivity of the Hbnet protocol was optimized based on the ability to find the networks in relaxed native proteins. All the motifs found for a given backbones were recombined by side-chain copy/pasting (run the script get_all_motifs.py). The resulting models were copied into the round2 folder.
+
+4.Since HBnet gives often strange results, do another round 

@@ -1,0 +1,28 @@
+<ROSETTASCRIPTS>
+    <SCOREFXNS>
+      <SFX1 weights=beta_nov15.wts>
+        <Reweight scoretype=angle_constraint weight=1.0 />
+        <Reweight scoretype=atom_pair_constraint weight=1.0 />
+        <Reweight scoretype=dihedral_constraint weight=1.0 />
+      </SFX1>
+      <SFX2 weights=talaris2013_cst.wts>
+	<Reweight scoretype=cart_bonded weight=0.5/>
+	<Reweight scoretype=pro_close weight=0.0/>
+      </SFX2>
+    </SCOREFXNS>
+    <TASKOPERATIONS>
+      <ReadResfile name="resfile" filename="resfile" />
+    </TASKOPERATIONS>
+    <FILTERS>
+    </FILTERS>
+    <MOVERS>
+      <Dssp name=dssp/>
+      <FastDesign name="fdesign" task_operations=resfile scorefxn="SFX1" cst_file="mortise_tenon_cst" ramp_down_constraints="0" />
+    </MOVERS>
+    <APPLY_TO_POSE>
+    </APPLY_TO_POSE>
+    <PROTOCOLS>
+      <Add mover_name="fdesign" />
+    </PROTOCOLS>
+</ROSETTASCRIPTS>
+

@@ -1,0 +1,6 @@
+In this round of design, only the surface is re-designed. 
+The aromatic rims are designed just based on patterns observed in native proteins. 
+The rest of the membrane-facing positions is designed into VLA and selected only based on local torsion angle preference (in terms of clashes between side-chains, V > L >> A). I was excluded for several reasons:
+- I is less abundant on the surface of native TMBarrels.
+- In terms of torsion angles and side-chains clashes, I is very similar to V. 
+- I was looking to reduce the computing time to focus on the design of the core (that is very computationally expensive). Therefore I simplified the membrane-exposed surface model. 

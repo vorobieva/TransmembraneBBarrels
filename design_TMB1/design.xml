@@ -1,0 +1,50 @@
+<ROSETTASCRIPTS>
+    <SCOREFXNS>
+      <ScoreFunction name="SFX1" weights="beta_nov15.wts">
+        Reweight scoretype=hbond_lr_bb weight=2. />
+        Reweight scoretype=coordinate_constraint weight=1. />
+        <Reweight scoretype="angle_constraint" weight="1.0" />
+        <Reweight scoretype="atom_pair_constraint" weight="1.0" />
+        <Reweight scoretype="dihedral_constraint" weight="1.0" />
+	<Reweight scoretype="aa_composition" weight="1.0" />
+	Set aa_composition_setup_file="surface.comp" />
+      </ScoreFunction>
+    </SCOREFXNS>
+      
+    <RESIDUE_SELECTORS>
+        <Layer name="surfacelayer" select_surface="true" ball_radius="2.0" use_sidechain_neighbors="true"
+         sc_neighbor_dist_exponent="1.0" sc_neighbor_dist_midpoint="9.0"
+         sc_neighbor_denominator="1.0" sc_neighbor_angle_shift_factor="0.5"
+         sc_neighbor_angle_exponent="2.0"
+         core_cutoff="2.1" surface_cutoff="1.0" />
+    </RESIDUE_SELECTORS>>
+
+    <TASKOPERATIONS>
+      <ReadResfile name="resfile" filename="surface.resfile" />
+    </TASKOPERATIONS>
+    <FILTERS>
+      Geometry name=geo omega=165 cart_bonded=20 confidence=0 />
+      ShapeComplementarity name=sc_filter min_sc=0.0 verbose=1 jump=1 write_int_area=1 />
+      Holes name=holes threshold=1.5 confidence=0 />
+      PackStat name=packstat threshold=0.4 confidence=1 />
+      SSPrediction name="sspred" confidence="0" threshold=0.4 use_svm="1" use_probability="1"/>
+
+
+    </FILTERS>
+    <MOVERS>
+      <AddCompositionConstraintMover name="addcomp1" filename="surface.comp" selector="surfacelayer" />
+      <Dssp name="dssp"/>
+      <FastDesign name="fdesign" task_operations="resfile" scorefxn="SFX1" />
+
+    </MOVERS>
+    <APPLY_TO_POSE>
+    </APPLY_TO_POSE>
+    <PROTOCOLS>
+      <Add mover_name="addcomp1" />>
+      <Add mover_name="fdesign" />
+      Add filter=holes/>
+      Add filter=packstat/>
+      Add filter=geo/>
+      Add filter_name=sspred />
+    </PROTOCOLS>
+</ROSETTASCRIPTS>

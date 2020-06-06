@@ -1,0 +1,46 @@
+<ROSETTASCRIPTS>
+    <SCOREFXNS>
+      <ScoreFunction name="SFX1" weights="ref2015_F.wts">
+        <Reweight scoretype="hbond_lr_bb" weight="2.0" />
+        <Reweight scoretype="angle_constraint" weight="1.0" />
+        <Reweight scoretype="atom_pair_constraint" weight="1.0" />
+        <Reweight scoretype="dihedral_constraint" weight="1.0" />
+      </ScoreFunction>
+    </SCOREFXNS>
+    <RESIDUE_SELECTORS>
+        # define the layers
+        <Layer name="coreRes" select_core="true" use_sidechain_neighbors="true" core_cutoff="2.1" surface_cutoff="1.0"/>
+        <Layer name="bdryRes" select_boundary="true" use_sidechain_neighbors="true" core_cutoff="2.1" surface_cutoff="1.0"/>
+        <Layer name="surfaceRes" select_surface="true" use_sidechain_neighbors="true" core_cutoff="2.1" surface_cutoff="1.0"/>
+    </RESIDUE_SELECTORS>>
+    <TASKOPERATIONS>
+      <ReadResfile name="resfile" filename="all.resfile" />
+    </TASKOPERATIONS>
+    <FILTERS>
+    </FILTERS>
+    <MOVERS>
+        <FastDesign name="fdesign" cst_file="girdle_cst" task_operations="resfile" scorefxn="SFX1" />
+        <MutateResidue name="Tyr19" target="19A" new_res="TYR" />
+        <MutateResidue name="Tyr47" target="47A" new_res="TYR" />
+        <MutateResidue name="Tyr73" target="73A" new_res="TYR" />
+        <MutateResidue name="Tyr99" target="99A" new_res="TYR" />
+        <MutateResidue name="Tyr33" target="33A" new_res="TYR" />
+        <MutateResidue name="Tyr61" target="61A" new_res="TYR" />
+        <MutateResidue name="Tyr87" target="87A" new_res="TYR" />
+        <MutateResidue name="Tyr111" target="111A" new_res="TYR" />
+    </MOVERS>
+    <APPLY_TO_POSE>
+    </APPLY_TO_POSE>
+    <PROTOCOLS>
+        <Add mover_name="Tyr19" />
+        <Add mover_name="Tyr47" />
+        <Add mover_name="Tyr73" />
+        <Add mover_name="Tyr99" />
+        <Add mover_name="Tyr33" />
+        <Add mover_name="Tyr61" />
+        <Add mover_name="Tyr87" />
+        <Add mover_name="Tyr111" />
+        <Add mover_name="fdesign" />
+    </PROTOCOLS>
+</ROSETTASCRIPTS>
+

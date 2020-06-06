@@ -1,0 +1,149 @@
+<ROSETTASCRIPTS>
+    <SCOREFXNS>
+      <ScoreFunction name="SFXN1" weights="ref2015.wts">
+        <Reweight scoretype="angle_constraint" weight="1.0" />
+        <Reweight scoretype="atom_pair_constraint" weight="1.0" />
+        <Reweight scoretype="dihedral_constraint" weight="1.0" />
+	<Reweight scoretype="fa_elec" weight="1.75" />
+	Reweight scoretype="fa_sol" weight="0.75" />
+        Reweight scoretype="lk_ball_wtd" weight="0.75" />
+      </ScoreFunction>
+      <ScoreFunction name="SFXN2" weights="ref2015.wts" >
+	<Reweight scoretype="fa_sol" weight="0.75" />
+	<Reweight scoretype="lk_ball_wtd" weight="0.75" />
+      </ScoreFunction>
+    </SCOREFXNS>
+
+    <RESIDUE_SELECTORS>
+        # Pro, cys and Gly are exception to the layer definition
+        <ResidueName name="CPG" residue_name3="CYS,PRO,GLY" /> //selects CPG residues
+            <Not name="not_CPG" selector="CPG" />
+
+       # The Tyrs and interacting negatively charged residues are exceptions to the layer definition
+	<ResiduePDBInfoHasLabel name="tyrMortise" property="HBNet" />
+			<Not name="not_tyrMortise" selector="tyrMortise" />
+	<Index name="Y" resnums="10,68" />
+			<Not name="NotY" selector="Y"/>
+			<And name="MotifNotY" selectors="tyrMortise,NotY" />
+
+        # turns have special definition in the resfile
+        <Index name="betaTurns" resnums="32,62,94" />
+                        <Not name="not_turns" selector="betaTurns" />
+
+        # define the layers
+        <Layer name="coreRes" select_core="true" use_sidechain_neighbors="true" core_cutoff="2.1" surface_cutoff="1.0"/>
+        <Layer name="bdryRes" select_boundary="true" use_sidechain_neighbors="true" core_cutoff="2.1" surface_cutoff="1.0"/>
+        <Layer name="surfaceRes" select_surface="true" use_sidechain_neighbors="true" core_cutoff="2.1" surface_cutoff="1.0"/>      
+
+        # define secondary structure
+        <SecondaryStructure name="helix" ss="H"  pose_secstruct="LLLLLEEEEEEEEEEELLLEEEEEEEEEEEEELLEEEEEEEEEELLLEEEEEEEEEEEEEEELLEEEEEEEEEEEELLLEEEEEEEEEEEEEEELLEEEEEEEEEELLLEEEEEEEEEEEEEL"/>
+        <SecondaryStructure name="strand" ss="E"  pose_secstruct="LLLLLEEEEEEEEEEELLLEEEEEEEEEEEEELLEEEEEEEEEELLLEEEEEEEEEEEEEEELLEEEEEEEEEEEELLLEEEEEEEEEEEEEEELLEEEEEEEEEELLLEEEEEEEEEEEEEL"/>
+        <SecondaryStructure name="loop" ss="L"  pose_secstruct="LLLLLEEEEEEEEEEELLLEEEEEEEEEEEEELLEEEEEEEEEELLLEEEEEEEEEEEEEEELLEEEEEEEEEEEELLLEEEEEEEEEEEEEEELLEEEEEEEEEELLLEEEEEEEEEEEEEL"/>
+
+        # combine the selectors in the same way as LayerDesign
+            And name="coreAll" selectors="coreRes,all,not_CPG,not_trp_corner" />
+            <And name="coreH" selectors="coreRes,helix,not_CPG,not_turns,not_tyrMortise" />
+            <And name="coreE" selectors="coreRes,strand,not_CPG,not_turns,not_tyrMortise" />
+            <And name="coreL" selectors="coreRes,loop,not_turns" />
+            And name="boundAll" selectors="boundRes,all,not_CPG,not_trp_corner" />
+            <And name="boundH" selectors="bdryRes,helix,not_CPG,not_turns,not_tyrMortise" />
+            <And name="boundE" selectors="bdryRes,strand,not_CPG,not_turns,not_tyrMortise" />
+            <And name="boundL" selectors="bdryRes,loop,not_turns" />
+            And name="surfAll" selectors="surfRes,all,not_CPG,not_trp_corner" />
+            <And name="surfH" selectors="surfaceRes,helix,not_CPG,not_turns,not_tyrMortise" />
+            <And name="surfE" selectors="surfaceRes,strand,not_CPG,not_turns,not_tyrMortise" />
+            <And name="surfL" selectors="surfaceRes,loop,not_turns" />
+
+    </RESIDUE_SELECTORS>>
+
+    <TASKOPERATIONS>
+      <ReadResfile name="resfile" filename="core.resfile" />
+        # as defined in LayerDesign
+            <OperateOnResidueSubset name="design_helixCore_AA" selector="coreH" >
+            <RestrictAbsentCanonicalAASRLT aas="NTEDARKQS"/>
+            </OperateOnResidueSubset>
+            <OperateOnResidueSubset name="design_strandCore_AA" selector="coreE" >
+            <RestrictAbsentCanonicalAASRLT aas="ADEFHKLMNQRSTVW"/> #allow all amino acids except IPC
+            </OperateOnResidueSubset>
+            <OperateOnResidueSubset name="design_loopCore_AA" selector="coreL" >
+            <RestrictAbsentCanonicalAASRLT aas="NTEDARKQSPG"/>
+            </OperateOnResidueSubset>
+
+            <OperateOnResidueSubset name="design_helixBound_AA" selector="boundH" >
+            <RestrictAbsentCanonicalAASRLT aas="ADEIKLMNQSTVYW"/>
+            </OperateOnResidueSubset>
+            <OperateOnResidueSubset name="design_strandBound_AA" selector="boundE" >
+            <RestrictAbsentCanonicalAASRLT aas="AEDFIKLMNQRSTVY"/>
+            </OperateOnResidueSubset>
+            <OperateOnResidueSubset name="design_loopBound_AA" selector="boundL" >
+            <RestrictAbsentCanonicalAASRLT aas="ADEFGIKLMNPQRSTVY"/>
+        </OperateOnResidueSubset>
+
+            <OperateOnResidueSubset name="repack_helixSurf_AA" selector="surfH" >
+            <RestrictToRepackingRLT/>
+            </OperateOnResidueSubset>
+            <OperateOnResidueSubset name="repack_strandSurf_AA" selector="surfE" >
+            <RestrictToRepackingRLT/>
+            </OperateOnResidueSubset>
+            <OperateOnResidueSubset name="repack_loopSurf_AA" selector="surfL" >
+            <RestrictToRepackingRLT/>
+            </OperateOnResidueSubset>
+
+        # limit CPG and Tyr mortise to repacking
+        <OperateOnResidueSubset name="repack_CPG" selector="CPG" >
+                <RestrictToRepackingRLT/>
+            </OperateOnResidueSubset>
+
+        <OperateOnResidueSubset name="repack_tyr" selector="tyrMortise" >
+                <RestrictToRepackingRLT/>
+            </OperateOnResidueSubset>
+
+        <ExtraRotamersGeneric name="ex1_ex2" ex1="1" ex2="1"/>
+
+        <InteractingRotamerExplosion name="rotexpl" ex_level="4" score_cutoff="0.5" target_seqpos="5B" debug="0" />
+
+    </TASKOPERATIONS>
+    <FILTERS>
+    </FILTERS>
+
+    <SIMPLE_METRICS>
+      <TotalEnergyMetric name="totE_motif" residue_selector="tyrMortise" use_native="0" scoretype="total_score" scorefxn="SFXN1" />
+      <TotalEnergyMetric name="totH_motif" residue_selector="tyrMortise" use_native="0" scoretype="hbond_sc" scorefxn="SFXN1" />
+      <TotalEnergyMetric name="totE_DE" residue_selector="MotifNotY" use_native="0" scoretype="total_score" scorefxn="SFXN1" />
+      <TotalEnergyMetric name="totH_DE" residue_selector="MotifNotY" use_native="0" scoretype="hbond_sc" scorefxn="SFXN1" />
+      <SelectedResidueCountMetric name="nMotif" residue_selector="tyrMortise" />
+      <SelectedResidueCountMetric name="nMotifNotY" residue_selector="MotifNotY" />
+    </SIMPLE_METRICS>
+
+    <MOVERS>
+      <Dssp name="dssp"/>
+      <FastDesign name="fdesign" cst_file="cst" task_operations="repack_CPG,repack_tyr,resfile,design_strandCore_AA,design_loopCore_AA,design_loopBound_AA,design_strandBound_AA,repack_loopSurf_AA,repack_strandSurf_AA" scorefxn="SFXN1" />
+
+      <MutateResidue name="Tyr34" target="34A" new_res="TYR" />
+      <MutateResidue name="Asp64" target="64A" new_res="ASP" />
+      <MutateResidue name="Asp96" target="96A" new_res="ASP" />
+      <RunSimpleMetrics name="totE_metrics" metrics="totE_motif" prefix="totE_" />
+      <RunSimpleMetrics name="totH_metrics" metrics="totH_motif" prefix="totH_" />
+      <RunSimpleMetrics name="DEE_metrics" metrics="totE_DE" prefix="DEE_" />
+      <RunSimpleMetrics name="DEH_metrics" metrics="totH_DE" prefix="DEH_" />
+      <RunSimpleMetrics name="nresMotif" metrics="nMotif" prefix="nres_" />
+      <RunSimpleMetrics name="nresMotifNotY" metrics="nMotifNotY" prefix="nresDE_" />
+
+    </MOVERS>
+    <APPLY_TO_POSE>
+    </APPLY_TO_POSE>
+    <PROTOCOLS>
+      <Add mover_name="Tyr34" />
+      <Add mover_name="Asp64" />
+      <Add mover_name="Asp96" />
+      <Add mover_name="fdesign" />
+      <Add mover_name="totE_metrics"/>
+      <Add mover_name="totH_metrics"/>
+      <Add mover_name="DEE_metrics"/>
+      <Add mover_name="DEH_metrics"/>
+      <Add mover_name="nresMotif"/>
+      <Add mover_name="nresMotifNotY"/>
+
+    </PROTOCOLS>
+    <OUTPUT scorefxn="SFXN1" />
+</ROSETTASCRIPTS>

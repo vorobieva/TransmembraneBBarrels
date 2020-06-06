@@ -1,0 +1,74 @@
+<ROSETTASCRIPTS>
+   <SCOREFXNS>
+     <ScoreFunction name="SFXN1" weights="ref2015.wts">
+       Reweight scoretype="cart_bonded" weight="0.5"/>
+       Reweight scoretype="pro_close" weight="0.0"/>
+     </ScoreFunction>
+   </SCOREFXNS>
+
+   <RESIDUE_SELECTORS>
+
+        <Layer name="coreRes" select_core="true" use_sidechain_neighbors="true" core_cutoff="2.1" surface_cutoff="1.0"/>
+        <Layer name="bdryRes" select_boundary="true" use_sidechain_neighbors="true" core_cutoff="2.1" surface_cutoff="1.0"/>
+        <Layer name="surfRes" select_surface="true" use_sidechain_neighbors="true" core_cutoff="2.1" surface_cutoff="1.0"/>
+
+    	<ResiduePDBInfoHasLabel name="hbnet_residues" property="HBNet" />
+        <Index name="gly_residues" resnums="14A,26A,40A,42A,54A,56A,72A,86A,88A,104A,116A" />
+    	<Neighborhood name="around_hbnet" selector="hbnet_residues" distance="5.0" />
+        <Neighborhood name="around_gly" selector="gly_residues" distance="5.0" />
+    	<And name="core_around_hbnet" selectors="coreRes,around_hbnet"/>
+        <And name="core_around_gly" selectors="coreRes,around_gly"/> 
+
+   </RESIDUE_SELECTORS>
+
+    <SIMPLE_METRICS>
+      TotalEnergyMetric name="totE_motif" residue_selector="tyrMortise" use_native="0" scoretype="total_score" scorefxn="SFXN1" />
+      TotalEnergyMetric name="totH_motif" residue_selector="tyrMortise" use_native="0" scoretype="hbond_sc" scorefxn="SFXN1" />
+      SelectedResidueCountMetric name="nMotif" residue_selector="tyrMortise" />
+      SelectedResidueCountMetric name="nMotifNotY" residue_selector="MotifNotY" />
+    </SIMPLE_METRICS>
+
+   <TASKOPERATIONS>
+
+            <OperateOnResidueSubset name="design_Core" selector="coreRes" >
+            <RestrictAbsentCanonicalAASRLT aas="ACDEFGHIKLMNPQRSTVYW"/>
+            </OperateOnResidueSubset>
+            <OperateOnResidueSubset name="repack_Bdry" selector="bdryRes" >
+            <PreventRepackingRLT/>
+            </OperateOnResidueSubset>
+            <OperateOnResidueSubset name="repack_Surf" selector="surfRes" >
+            <PreventRepackingRLT/>
+            </OperateOnResidueSubset>
+
+   </TASKOPERATIONS>
+
+   <FILTERS>
+    <Holes name="network_holes_atm" threshold="10000" residue_selector="core_around_hbnet" normalize_per_atom="true" exclude_bb_atoms="true" confidence="0" />
+    <Holes name="network_holes_res" threshold="10000" residue_selector="core_around_hbnet" normalize_per_residue="true" exclude_bb_atoms="true" confidence="0" />
+
+    <Holes name="gly_holes_atm" threshold="10000" residue_selector="core_around_gly" normalize_per_atom="true" exclude_bb_atoms="false" confidence="0" />
+    <Holes name="gly_holes_res" threshold="10000" residue_selector="core_around_gly" normalize_per_residue="true" exclude_bb_atoms="false" confidence="0" />
+
+
+    <BuriedUnsatHbonds name="sc_buns_hbnetA" report_sc_heavy_atom_unsats="True" report_nonheavy_unsats="true" report_bb_heavy_atom_unsats="false" use_legacy_options="False" scorefxn="SFXN1" ignore_surface_res="True" print_out_info_to_pdb="True" confidence="0" probe_radius="1.4" />
+
+    <TotalSasa name="pore" threshold="800" confidence="0" upper_threshold="10000" task_operations="design_Core,repack_Bdry,repack_Surf" />
+
+   </FILTERS>
+
+   <MOVERS>
+     <MakePolyX name="polyA" aa="ALA" keep_pro="1"  keep_gly="1" keep_disulfide_cys="0" />
+     <HBNet name="find_net" scorefxn="SFXN1" store_network_scores_in_pose="true" find_only_native_networks="True" min_percent_hbond_capacity="0.35" task_operations="design_Core,repack_Bdry,repack_Surf" write_network_pdbs="true" hb_threshold="-0.1" verbose="1" max_unsat_Hpol="1000" />
+
+   </MOVERS>
+
+<PROTOCOLS>
+    <Add filter="network_holes_atm" />
+    <Add filter="network_holes_res" />
+    <Add filter="gly_holes_atm" />
+    <Add filter="gly_holes_res" />
+    <Add filter="sc_buns_hbnetA" />
+    <Add filter="pore" />
+</PROTOCOLS>
+
+</ROSETTASCRIPTS>

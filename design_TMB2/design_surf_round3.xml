@@ -1,0 +1,52 @@
+<ROSETTASCRIPTS>
+    <SCOREFXNS>
+      <ScoreFunction name="SFX1" weights="ref2015.wts">
+        <Reweight scoretype="hbond_lr_bb" weight="2.0" />
+        <Reweight scoretype="angle_constraint" weight="1.0" />
+        <Reweight scoretype="atom_pair_constraint" weight="1.0" />
+        <Reweight scoretype="dihedral_constraint" weight="1.0" />
+      </ScoreFunction>
+    </SCOREFXNS>
+
+    <RESIDUE_SELECTORS>
+
+    </RESIDUE_SELECTORS>>
+
+    <TASKOPERATIONS>
+      <ReadResfile name="resfile" filename="surface_gly_round3.resfile" />
+
+    </TASKOPERATIONS>
+    <FILTERS>
+
+    </FILTERS>
+    <MOVERS>
+      <FastDesign name="fdesign" cst_file="cst" task_operations="resfile" scorefxn="SFX1" />
+      <MutateResidue name="Tyr15" target="15A" new_res="TYR" />
+      <MutateResidue name="Tyr29" target="29A" new_res="TYR" />
+      <MutateResidue name="Tyr41" target="41A" new_res="TYR" />
+      <MutateResidue name="Tyr59" target="59A" new_res="TYR" />
+      <MutateResidue name="Tyr75" target="75A" new_res="TYR" />
+      <MutateResidue name="Tyr91" target="91A" new_res="TYR" />
+      <MutateResidue name="Tyr103" target="103A" new_res="TYR" />
+      <MutateResidue name="Tyr119" target="119A" new_res="TYR" />
+      <MutateResidue name="Asn19" target="19A" new_res="ASN" />
+      <MutateResidue name="Asn79" target="79A" new_res="ASN" />
+
+    </MOVERS>
+    <APPLY_TO_POSE>
+    </APPLY_TO_POSE>
+    <PROTOCOLS>
+      <Add mover_name="Tyr15" />
+      <Add mover_name="Tyr29" />
+      <Add mover_name="Tyr41" />
+      <Add mover_name="Tyr59" />
+      <Add mover_name="Tyr75" />
+      <Add mover_name="Tyr91" />
+      <Add mover_name="Tyr103" />
+      <Add mover_name="Tyr119" />
+      <Add mover_name="Asn19" />
+      <Add mover_name="Asn79" />
+      <Add mover_name="fdesign" />
+      
+    </PROTOCOLS>
+</ROSETTASCRIPTS>
